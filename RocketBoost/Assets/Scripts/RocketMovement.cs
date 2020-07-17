@@ -7,9 +7,11 @@ public class RocketMovement : MonoBehaviour
 {
     // Start is called before the first frame update
     Rigidbody m_RocketShip;
+    AudioSource m_ThrustSound;
     void Start()
     {
         m_RocketShip = GetComponent<Rigidbody>();
+        m_ThrustSound = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -23,6 +25,14 @@ public class RocketMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         {
             m_RocketShip.AddRelativeForce(Vector3.up);
+            if (!m_ThrustSound.isPlaying)
+            {
+                m_ThrustSound.Play();
+            }
+        }
+        else
+        {
+            m_ThrustSound.Stop();
         }
 
         if (Input.GetKey(KeyCode.A))
