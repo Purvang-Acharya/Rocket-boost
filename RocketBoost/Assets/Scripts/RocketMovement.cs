@@ -8,6 +8,12 @@ public class RocketMovement : MonoBehaviour
     // Start is called before the first frame update
     Rigidbody m_RocketShip;
     AudioSource m_ThrustSound;
+    [SerializeField]
+    float rcsThrust = 100f;
+    
+    [SerializeField]
+    float mainThrust = 100f;
+    
     void Start()
     {
         m_RocketShip = GetComponent<Rigidbody>();
@@ -19,13 +25,21 @@ public class RocketMovement : MonoBehaviour
     {
         Thrust();
         Rotate();
-    }  
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        switch (collision.gameObject.tag)
+        {
+            
+
+        }
+    }
 
     private void Thrust()
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            m_RocketShip.AddRelativeForce(Vector3.up);
+            m_RocketShip.AddRelativeForce(Vector3.up * mainThrust);
             if (!m_ThrustSound.isPlaying)
             {
                 m_ThrustSound.Play();
@@ -40,14 +54,15 @@ public class RocketMovement : MonoBehaviour
     private void Rotate()
     {
         m_RocketShip.freezeRotation = true;
+        float rotationThisFrame = rcsThrust * Time.deltaTime;
         if (Input.GetKey(KeyCode.A))
         {
-            transform.Rotate(Vector3.forward);
+            transform.Rotate(Vector3.forward * rotationThisFrame);
         }
 
         else if (Input.GetKey(KeyCode.D))
         {
-            transform.Rotate(-Vector3.forward);
+            transform.Rotate(-Vector3.forward * rotationThisFrame);
         }
         m_RocketShip.freezeRotation = false;
     }
