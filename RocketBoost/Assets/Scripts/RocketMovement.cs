@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class RocketMovement : MonoBehaviour
 {
@@ -30,6 +31,19 @@ public class RocketMovement : MonoBehaviour
     {
         switch (collision.gameObject.tag)
         {
+            case "Friendly":
+                break;
+
+
+            case "Finish":
+                SceneManager.LoadScene(1);
+                break;
+
+
+            default:
+                SceneManager.LoadScene(0);
+                break;
+
             
 
         }
