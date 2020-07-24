@@ -8,12 +8,21 @@ public class RocketMovement : MonoBehaviour
 {
     // Start is called before the first frame update
     Rigidbody m_RocketShip;
-    AudioSource m_ThrustSound;
+    AudioSource audioSource;
     [SerializeField]
     float rcsThrust = 100f;
 
     [SerializeField]
     float mainThrust = 100f;
+
+    [SerializeField]
+    AudioClip mainEngine;
+
+    [SerializeField]
+    AudioClip levelFinishedSuccess;
+
+    [SerializeField]
+    AudioClip levelFinishedDeath;
 
     enum State { Alive, Dying , Transcending };
     State state = State.Alive;
@@ -21,7 +30,7 @@ public class RocketMovement : MonoBehaviour
     void Start()
     {
         m_RocketShip = GetComponent<Rigidbody>();
-        m_ThrustSound = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -29,7 +38,7 @@ public class RocketMovement : MonoBehaviour
     {
         if (state == State.Alive)
         {
-            Thrust();
+            RespondToThrustInput();
             Rotate();
         }
     }
@@ -46,19 +55,30 @@ public class RocketMovement : MonoBehaviour
 
 
             case "Finish":
-                state = State.Transcending;
-                Invoke("LoadNextScene", 1f);                
+                StartSuccessSequence();
                 break;
 
 
             default:
-                state = State.Dying;
-                Invoke("LoadFirstScene", 1f);                
+                StartDeathSequence();
                 break;
-
-
-
         }
+    }
+
+    private void StartDeathSequence()
+    {
+        state = State.Dying;
+        audioSource.Stop();
+        audioSource.PlayOneShot(levelFinishedDeath);
+        Invoke("LoadFirstScene", 1f);
+    }
+
+    private void StartSuccessSequence()
+    {
+        state = State.Transcending;
+        audioSource.Stop();
+        audioSource.PlayOneShot(levelFinishedSuccess);
+        Invoke("LoadNextScene", 1f);
     }
 
     private void LoadFirstScene()
@@ -71,19 +91,24 @@ public class RocketMovement : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
-    private void Thrust()
+    private void RespondToThrustInput()
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            m_RocketShip.AddRelativeForce(Vector3.up * mainThrust);
-            if (!m_ThrustSound.isPlaying)
-            {
-                m_ThrustSound.Play();
-            }
+            ApplyThrust();
         }
         else
         {
-            m_ThrustSound.Stop();
+            audioSource.Stop();
+        }
+    }
+
+    private void ApplyThrust()
+    {
+        m_RocketShip.AddRelativeForce(Vector3.up * mainThrust);
+        if (!audioSource.isPlaying)
+        {
+            audioSource.PlayOneShot(mainEngine);
         }
     }
 
