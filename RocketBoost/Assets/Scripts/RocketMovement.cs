@@ -9,20 +9,16 @@ public class RocketMovement : MonoBehaviour
     // Start is called before the first frame update
     Rigidbody m_RocketShip;
     AudioSource audioSource;
-    [SerializeField]
-    float rcsThrust = 100f;
+    [SerializeField] float rcsThrust = 100f;
+    [SerializeField] float mainThrust = 100f;
 
-    [SerializeField]
-    float mainThrust = 100f;
+    [SerializeField] AudioClip mainEngine;
+    [SerializeField] AudioClip levelFinishedSuccess;
+    [SerializeField] AudioClip levelFinishedDeath;
 
-    [SerializeField]
-    AudioClip mainEngine;
-
-    [SerializeField]
-    AudioClip levelFinishedSuccess;
-
-    [SerializeField]
-    AudioClip levelFinishedDeath;
+    //[SerializeField] ParticleSystem mainEngineParticles;
+    [SerializeField] ParticleSystem levelFinishedSuccessParticles;
+    [SerializeField] ParticleSystem levelFinishedDeathParticles;
 
     enum State { Alive, Dying , Transcending };
     State state = State.Alive;
@@ -39,7 +35,7 @@ public class RocketMovement : MonoBehaviour
         if (state == State.Alive)
         {
             RespondToThrustInput();
-            Rotate();
+            RespondToRotateInput();
         }
     }
     private void OnCollisionEnter(Collision collision)
@@ -70,6 +66,7 @@ public class RocketMovement : MonoBehaviour
         state = State.Dying;
         audioSource.Stop();
         audioSource.PlayOneShot(levelFinishedDeath);
+        levelFinishedDeathParticles.Play();
         Invoke("LoadFirstScene", 1f);
     }
 
@@ -78,6 +75,7 @@ public class RocketMovement : MonoBehaviour
         state = State.Transcending;
         audioSource.Stop();
         audioSource.PlayOneShot(levelFinishedSuccess);
+        levelFinishedSuccessParticles.Play();
         Invoke("LoadNextScene", 1f);
     }
 
@@ -100,19 +98,23 @@ public class RocketMovement : MonoBehaviour
         else
         {
             audioSource.Stop();
+           // mainEngineParticles.Stop();
+            
         }
     }
 
     private void ApplyThrust()
     {
+        
         m_RocketShip.AddRelativeForce(Vector3.up * mainThrust);
         if (!audioSource.isPlaying)
         {
             audioSource.PlayOneShot(mainEngine);
         }
+       // mainEngineParticles.Play();
     }
 
-    private void Rotate()
+    private void RespondToRotateInput()
     {
         m_RocketShip.freezeRotation = true;
         float rotationThisFrame = rcsThrust * Time.deltaTime;
